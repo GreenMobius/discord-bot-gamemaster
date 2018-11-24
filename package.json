@@ -1,0 +1,8 @@
+{
+  "name": "gamemaster-bot",
+  "version": "0.1.0",
+  "description": "Game manager bot",
+  "main": "bot.js",
+  "author": "greenmobius",
+  "dependencies": {}
+}
