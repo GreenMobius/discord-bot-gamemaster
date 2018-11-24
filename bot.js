@@ -29,18 +29,10 @@ bot.on('message', function (user, userID, channelID, message, evt) {
     if (message.substring(0, 1) == '!') {
         var args = message.substring(1).split(' ');
         var cmd = args[0];
-        var user = message.author.id;
+        var user = message.author;
 
         args = args.splice(1);
         switch(cmd) {
-            // !ping
-            case 'ping':
-                bot.sendMessage({
-                    to: channelID,
-                    message: 'Pong!'
-                });
-            break;
-
             // !new <id> <game> <maxplayers> <year> <month> <day> <hours> <minutes> <message>
             case 'new':
                 //TODO: check permissions for game creation
@@ -66,7 +58,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     'game' : args[2],
                     'maxplayers' : args[3],
                     'date' : new Date(args[4], args[5], args[6], args[7], args[8], 0, 0),
-                    'owner' : message.author.id,
+                    'owner' : user,
                     'message' : rest,
                     'players' : [user],
                     'started' : false,
@@ -82,34 +74,119 @@ bot.on('message', function (user, userID, channelID, message, evt) {
             
             // !games
             case 'games':
-                //check permissions for game viewing
-                //display list of games
+                //TODO: check permissions for game viewing
 
-            // !join <id>
+                //display list of games
+                //create embed
+                const embeddedMessage = new Discord.RichEmbed()
+                    .setTitle("Upcoming games:")
+                    .setColor([0, 166, 14]);
+
+                //populate embed with games
+                Object.keys(games).foreach(function(key) {
+                    //only display games not started
+                    if(games[key].started) {
+                        continue;
+                    }
+                    //generate array of usernames from users
+                    var playerList = [];
+                    games[key].players.foreach(function(user) {
+                        playerList.push(user.username);
+                    })
+
+                    embeddedMessage.addField(
+                        key + ":",
+                        "Type : " + games[key].game + "\n" +
+                        "# Players / Max : " + games[key].players.length + "/" + games[key].maxplayers + "\n" +
+                        "Date : " + games[key].date + "\n" +
+                        "Owner : " + games[key].owner.username + "\n" +
+                        "Players : " + playerList + "\n"
+                    );
+                });
+                //send message
+                message.channel.send({embed});
+                break;
+
+            //TODO !join <id>
             case 'join':
-                //check permissions to join game
+                //TODO: check permissions to join game
+
+                var game = games[args[1]];
+
+                //check if game id exists
+                if(game === null) {
+                    bot.sendMessage({
+                        to: channelID,
+                        message: 'Error: Game ' + args[1] + ' does not exist. No game joined.'
+                    });
+                    break;
+                }
+
                 //check if game is full
-                //display success/fail message
+                if(game.maxplayers === game.players.length) {
+                    bot.sendMessage({
+                        to: channelID,
+                        message: 'Error: Game ' + args[1] + ' is full. No game joined.'
+                    });
+                    break;
+                }
+
+                //add user to game
+                game.players.push(message.author);
+
+                //display success message
+                bot.sendMessage({
+                    to: channelID,
+                    message: 'Joined game ' + args[1] + '.'
+                });
+                break;
             
             // !leave <id>
             case 'leave':
-                //check if in game
-                //display success/fail message
+                var game = games[args[1]];
 
-            // !remove <id>
+                //check if game id exists
+                if(game === null) {
+                    bot.sendMessage({
+                        to: channelID,
+                        message: 'Error: Game ' + args[1] + ' does not exist. No game left.'
+                    });
+                    break;
+                }
+
+                //check if in game
+                if(game.players.indexOf(message.author) == -1) {
+                    bot.sendMessage({
+                        to: channelID,
+                        message: 'Error: You are not a part of game ' + args[1] + '. No game left.'
+                    });
+                    break;
+                }
+
+                //remove from list
+                game.players.remove(message.author);
+
+                //display success message
+                bot.sendMessage({
+                    to: channelID,
+                    message: 'Successfully left game ' + args[1] + '.'
+                });
+                break;
+
+            //TODO !remove <id>
             case 'remove':
-                //check permissions for admin / game owner
+                //TODO: check permissions for admin / game owner
                 //remove game from list
                 //display success/fail message
 
-            // !start <id>
+            //TODO !start <id>
             case 'start':
-                //check permissions for admin / game owner
+                //TODO: check permissions for admin / game owner
                 //remove game from list
                 //notify all players game is beginning
                 //display success/fail message
 
-            // !help
+            //TODO !help
             case 'help':
                 //display help
 
