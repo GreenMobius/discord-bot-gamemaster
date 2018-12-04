@@ -155,7 +155,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 }
 
                 //check if in game
-                if(game.players.indexOf(message.author) == -1) {
+                if(game.players.indexOf(user) == -1) {
                     bot.sendMessage({
                         to: channelID,
                         message: 'Error: You are not a part of game ' + args[1] + '. No game left.'
@@ -164,7 +164,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 }
 
                 //remove from list
-                game.players.remove(message.author);
+                game.players.remove(user);
 
                 //display success message
                 bot.sendMessage({
@@ -173,11 +173,29 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 });
                 break;
 
-            //TODO !remove <id>
+            // !remove <id>
             case 'remove':
                 //TODO: check permissions for admin / game owner
+
+                //check if game id exists
+                var game = games[args[1]];
+                if(game === null) {
+                    bot.sendMessage({
+                        to: channelID,
+                        message: 'Error: Game ' + args[1] + ' does not exist!'
+                    });
+                    break;
+                }
+
                 //remove game from list
-                //display success/fail message
+                games.remove(args[1]);
+
+                //display success message
+                bot.sendMessage({
+                    to: channelID,
+                    message: 'Successfully removed game ' + args[1] + '!'
+                });
+                break;
 
             //TODO !start <id>
             case 'start':
