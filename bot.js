@@ -204,10 +204,19 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 //notify all players game is beginning
                 //display success/fail message
 
-            //TODO !help
+            // !help
             case 'help':
                 //display help
-
+                bot.sendMessage({
+                    to: channelID,
+                    message: 'Create new game: new <id> <game> <maxplayers> <year> <month> <day> <hours> <minutes> <message>\n' +
+                             'View games: games\n' +
+                             'Join game: join <id>\n' +
+                             'Leave game: leave <id>\n' +
+                             'Start game: start <id>\n' +
+                             'Remove game: remove <id>\n'
+                });
+            
             //invalid command
             default:
                 //error message
