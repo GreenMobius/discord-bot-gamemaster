@@ -200,9 +200,40 @@ bot.on('message', function (user, userID, channelID, message, evt) {
             //TODO !start <id>
             case 'start':
                 //TODO: check permissions for admin / game owner
+
+                //check if game exists
+                var game = games[args[1]];
+                if(game === null) {
+                    bot.sendMessage({
+                        to: channelID,
+                        message: 'Error: Game ' + args[1] + ' does not exist!'
+                    });
+                    break;
+                }
+
                 //remove game from list
+                games.remove(args[1]);
+
                 //notify all players game is beginning
-                //display success/fail message
+                game.players.foreach(function(p) {
+                    const embeddedMessage = new Discord.RichEmbed()
+                        .setTitle("" + user.nickname + ", your game is starting soon!")
+                        .setColor([0, 166, 14]);
+
+                    embeddedMessage.addField(
+                        key + ":",
+                        "Type : " + games[key].game + "\n" +
+                        "# Players / Max : " + games[key].players.length + "/" + games[key].maxplayers + "\n" +
+                        "Date : " + games[key].date + "\n" +
+                        "Owner : " + games[key].owner.username + "\n" +
+                        "Players : " + playerList + "\n"
+                    );
+
+                    //TODO this is wrong - dm the user
+                    message.user.id.send({embed});
+                });
+
+                //display success message
 
             //TODO !help
             case 'help':
